@@ -3,19 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filtro AR 3D - Combustão do Metano (BioModel)</title>
+    <title>Filtro AR 3D Revisado - Combustão do Metano</title>
     
     <!-- Bibliotecas de Renderização 3D e AR -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     
-    <!-- Bibliotecas de Rastreamento de Mão (MediaPipe) -->
+    <!-- Bibliotecas de Rastreamento de Mão (MediaPipe via CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 
     <style>
         body { margin: 0; overflow: hidden; font-family: sans-serif; background-color: #000; }
         #canvas-container { position: absolute; width: 100%; height: 100%; z-index: 1; }
-        video { position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 0; transform: scaleX(-1); }
+        
+        video { 
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            transform: scaleX(-1);
+        }
+        
         #instrucoes {
             position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.7); color: white; padding: 15px 25px;
@@ -26,59 +35,124 @@
 </head>
 <body>
 
-    <div id="instrucoes">Abra a palma da mão para ver a reação em 3D real</div>
+    <div id="instrucoes">Abra a palma da mão para ver a combustão do metano</div>
     
     <video id="webcam" autoplay playsinline></video>
 
     <div id="canvas-container">
         <a-scene embedded vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
             
-            <!-- Carregamento dos Modelos 3D Reais das Moléculas -->
-            <a-assets>
-                <a-asset-item id="mod-ch4" src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/Methane.glb"></a-asset-item>
-                <a-asset-item id="mod-o2" src="https://cdn.jsdelivr.net/gh/pmndrs/market-assets@master/contents/oxygen_molecule/model.gltf"></a-asset-item>
-                <a-asset-item id="mod-co2" src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/CarbonDioxide.glb"></a-asset-item>
-                <a-asset-item id="mod-h2o" src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/Water.glb"></a-asset-item>
-            </a-scene>
-            
             <a-camera position="0 0 0" look-controls="enabled: false" wasd-controls="enabled: false"></a-camera>
 
-            <!-- Iluminação ambiente balanceada para os modelos 3D brilharem sem sombras escuras -->
-            <a-light type="ambient" intensity="1.2"></a-light>
-            <a-light type="directional" position="1 2 1" intensity="0.8"></a-light>
+            <!-- Iluminação Tridimensional Avançada (Estilo Laboratório Digital) -->
+            <a-light type="ambient" intensity="0.7"></a-light>
+            <a-light type="directional" position="2 4 3" intensity="1.2" castShadow="false"></a-light>
+            <a-light type="directional" position="-2 -1 -2" intensity="0.5"></a-light>
 
-            <!-- CONTAINER DO FILTRO -->
-            <a-entity id="filtro-reacao" position="0 0 -2.4" scale="0.45 0.45 0.45" visible="false">
+            <!-- CONTAINER GLOBAL: Posição calibrada no eixo Z para enquadramento instantâneo -->
+            <a-entity id="filtro-reacao" position="0 0 -2.3" scale="0.4 0.4 0.4" visible="false">
                 
-                <!-- REAGENTE 1: CH4 (Modelo 3D Computacional Exato) -->
-                <a-entity position="-1.5 0 0" gltf-model="#mod-ch4" scale="0.8 0.8 0.8" rotation="0 45 0"></a-entity>
-
-                <!-- Sinal de Adição (+) -->
-                <a-entity position="-0.8 0 0">
-                    <a-box position="0 0 0" width="0.03" height="0.15" depth="0.03" color="#FFFFFF" material="shader: flat;"></a-box>
-                    <a-box position="0 0 0" width="0.15" height="0.03" depth="0.03" color="#FFFFFF" material="shader: flat;"></a-box>
+                <!-- ================================================================= -->
+                <!-- REAGENTE 1: METANO (CH4) - Geometria Tetraédrica Real Reorganizada -->
+                <!-- ================================================================= -->
+                <a-entity position="-1.5 0 0" rotation="15 35 10">
+                    <!-- Átomo Central de Carbono (CPK: Preto Brilhante) -->
+                    <a-sphere position="0 0 0" radius="0.14" color="#1A1A1A" material="roughness: 0.2; metalness: 0.1;"></a-sphere>
+                    
+                    <!-- H1: Superior Haste Vertical -->
+                    <a-entity>
+                        <a-cylinder position="0 0.11 0" radius="0.018" height="0.22" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                        <a-sphere position="0 0.22 0" radius="0.08" color="#FFFFFF" material="roughness: 0.1;"></a-sphere>
+                    </a-entity>
+                    
+                    <!-- H2: Inferior Esquerdo Frontal -->
+                    <a-entity rotation="0 0 120">
+                        <a-cylinder position="0 0.11 0" radius="0.018" height="0.22" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                        <a-sphere position="0 0.22 0" radius="0.08" color="#FFFFFF" material="roughness: 0.1;"></a-sphere>
+                    </a-entity>
+                    
+                    <!-- H3: Inferior Direito Frontal -->
+                    <a-entity rotation="60 120 -60">
+                        <a-cylinder position="0 0.11 0" radius="0.018" height="0.22" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                        <a-sphere position="0 0.22 0" radius="0.08" color="#FFFFFF" material="roughness: 0.1;"></a-sphere>
+                    </a-entity>
+                    
+                    <!-- H4: Inferior Traseiro -->
+                    <a-entity rotation="-60 120 60">
+                        <a-cylinder position="0 0.11 0" radius="0.018" height="0.22" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                        <a-sphere position="0 0.22 0" radius="0.08" color="#FFFFFF" material="roughness: 0.1;"></a-sphere>
+                    </a-entity>
                 </a-entity>
 
-                <!-- REAGENTE 2: O2 (Modelo 3D Real de Ligação Dupla) -->
-                <a-entity position="-0.2 0 0" gltf-model="#mod-o2" scale="0.7 0.7 0.7"></a-entity>
+                <!-- SINAL DE ADIÇÃO (+) -->
+                <a-entity position="-0.85 0 0">
+                    <a-box position="0 0 0" width="0.03" height="0.16" depth="0.03" color="#FFFFFF" material="shader: flat;"></a-box>
+                    <a-box position="0 0 0" width="0.16" height="0.03" depth="0.03" color="#FFFFFF" material="shader: flat;"></a-box>
+                </a-entity>
 
-                <!-- Seta da Reação (->) -->
+                <!-- ================================================================= -->
+                <!-- REAGENTE 2: GÁS OXIGÊNIO (O2) - Esferas Vermelhas com Dupla Ligação -->
+                <!-- ================================================================= -->
+                <a-entity position="-0.25 0 0" rotation="0 20 45">
+                    <!-- Átomo Oxigênio Esquerdo -->
+                    <a-sphere position="-0.15 0 0" radius="0.13" color="#CC0000" material="roughness: 0.2; metalness: 0.1;"></a-sphere>
+                    <!-- Átomo Oxigênio Direito -->
+                    <a-sphere position="0.15 0 0" radius="0.13" color="#CC0000" material="roughness: 0.2; metalness: 0.1;"></a-sphere>
+                    
+                    <!-- Dupla Ligação (Varetas Paralelas Perfeitas) -->
+                    <a-cylinder position="0 0.03 0" rotation="0 0 90" radius="0.016" height="0.30" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                    <a-cylinder position="0 -0.03 0" rotation="0 0 90" radius="0.016" height="0.30" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                </a-entity>
+
+                <!-- SETA DE REAÇÃO (->) -->
                 <a-entity position="0.35 0 0">
                     <a-box position="-0.04 0 0" width="0.15" height="0.02" depth="0.02" color="#FFFFFF" material="shader: flat;"></a-box>
                     <a-cone position="0.05 0 0" radius-bottom="0.05" height="0.08" color="#FFFFFF" rotation="0 0 -90" material="shader: flat;"></a-cone>
                 </a-entity>
 
-                <!-- PRODUTO 1: CO2 (Modelo 3D Linear Perfeito) -->
-                <a-entity position="0.9 0 0" gltf-model="#mod-co2" scale="0.8 0.8 0.8"></a-entity>
-
-                <!-- Sinal de Adição (+) -->
-                <a-entity position="1.4 0 0">
-                    <a-box position="0 0 0" width="0.03" height="0.15" depth="0.03" color="#FFFFFF" material="shader: flat;"></a-box>
-                    <a-box position="0 0 0" width="0.15" height="0.03" depth="0.03" color="#FFFFFF" material="shader: flat;"></a-box>
+                <!-- ================================================================= -->
+                <!-- PRODUTO 1: DIÓXIDO DE CARBONO (CO2) - Alinhamento Linear Perfeito -->
+                <!-- ================================================================= -->
+                <a-entity position="0.9 0 0" rotation="30 10 0">
+                    <!-- Carbono Central -->
+                    <a-sphere position="0 0 0" radius="0.14" color="#1A1A1A" material="roughness: 0.2; metalness: 0.1;"></a-sphere>
+                    
+                    <!-- Oxigênio Esquerdo + Suas Duas Varetas -->
+                    <a-sphere position="-0.24 0 0" radius="0.13" color="#CC0000" material="roughness: 0.2; metalness: 0.1;"></a-sphere>
+                    <a-cylinder position="-0.12 0.03 0" rotation="0 0 90" radius="0.016" height="0.24" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                    <a-cylinder position="-0.12 -0.03 0" rotation="0 0 90" radius="0.016" height="0.24" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                    
+                    <!-- Oxigênio Direito + Suas Duas Varetas -->
+                    <a-sphere position="0.24 0 0" radius="0.13" color="#CC0000" material="roughness: 0.2; metalness: 0.1;"></a-sphere>
+                    <a-cylinder position="0.12 0.03 0" rotation="0 0 90" radius="0.016" height="0.24" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                    <a-cylinder position="0.12 -0.03 0" rotation="0 0 90" radius="0.016" height="0.24" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
                 </a-entity>
 
-                <!-- PRODUTO 2: H2O (Modelo 3D Angular Preciso, Sem Reflexos) -->
-                <a-entity position="1.9 0 0" gltf-model="#mod-h2o" scale="0.8 0.8 0.8" rotation="0 90 0"></a-entity>
+                <!-- SINAL DE ADIÇÃO (+) nos Produtos -->
+                <a-entity position="1.45 0 0">
+                    <a-box position="0 0 0" width="0.03" height="0.16" depth="0.03" color="#FFFFFF" material="shader: flat;"></a-box>
+                    <a-box position="0 0 0" width="0.16" height="0.03" depth="0.03" color="#FFFFFF" material="shader: flat;"></a-box>
+                </a-entity>
+
+                <!-- ================================================================= -->
+                <!-- PRODUTO 2: ÁGUA (H2O) - Geometria Angular Molecular Precisa -->
+                <!-- ================================================================= -->
+                <a-entity position="1.95 0 0" rotation="0 40 0">
+                    <!-- Oxigênio Central -->
+                    <a-sphere position="0 0 0" radius="0.13" color="#CC0000" material="roughness: 0.2; metalness: 0.1;"></a-sphere>
+                    
+                    <!-- Hidrogênio Esquerdo (Inclinado em ângulo molecular) -->
+                    <a-entity rotation="0 0 52.25">
+                        <a-cylinder position="0 -0.11 0" radius="0.018" height="0.22" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                        <a-sphere position="0 -0.22 0" radius="0.08" color="#FFFFFF" material="roughness: 0.1;"></a-sphere>
+                    </a-entity>
+                    
+                    <!-- Hidrogênio Direito (Inclinado para formar o ângulo total de ~104.5°) -->
+                    <a-entity rotation="0 0 -52.25">
+                        <a-cylinder position="0 -0.11 0" radius="0.018" height="0.22" color="#D8D8D8" material="roughness: 0.3;"></a-cylinder>
+                        <a-sphere position="0 -0.22 0" radius="0.08" color="#FFFFFF" material="roughness: 0.1;"></a-sphere>
+                    </a-entity>
+                </a-entity>
 
             </a-entity>
         </a-scene>
@@ -120,6 +194,7 @@
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 const landmarks = results.multiHandLandmarks[0];
                 
+                // Valida palma aberta através das pontas dos dedos acima das juntas
                 const isHandOpen = 
                     landmarks[8].y < landmarks[6].y &&
                     landmarks[12].y < landmarks[10].y &&
@@ -127,10 +202,11 @@
                     landmarks[20].y < landmarks[18].y;
 
                 if (isHandOpen) {
-                    const handX = (landmarks[9].x - 0.5) * 2.5; 
-                    const handY = (landmarks[9].y - 0.5) * -2.5;
+                    // Mapeamento e centralização vetorial baseada no centro da palma da mão (landmark 9)
+                    const handX = (landmarks[9].x - 0.5) * 2.4; 
+                    const handY = (landmarks[9].y - 0.5) * -2.4;
                     
-                    filtroReacao.setAttribute('position', `${handX} ${handY} -2.4`);
+                    filtroReacao.setAttribute('position', `${handX} ${handY} -2.3`);
                     filtroReacao.setAttribute('visible', 'true');
                     instrucoes.style.display = 'none';
                 } else {
