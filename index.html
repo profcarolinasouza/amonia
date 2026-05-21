@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtro AR - Síntese da Amônia</title>
+    
+    <!-- Bibliotecas de Renderização 3D e AR -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    
+    <!-- Bibliotecas de Rastreamento de Mão (MediaPipe via CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; background-color: #000; }
+        #canvas-container { position: absolute; width: 100%; height: 100%; z-index: 1; }
+        video { display: none; }
+        
+        /* Interface de Instrução */
+        #instrucoes {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7); color: white; padding: 15px 25px;
+            border-radius: 20px; text-align: center; z-index: 10; pointer-events: none;
+            font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="instrucoes">Abra a palma da mão para ver a reação molecular</div>
+    <div id="canvas-container">
+        <a-scene embedded vr-mode-ui="enabled: false">
+            
+            <!-- Câmera do A-Frame -->
+            <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+            <!-- CONTAINER DO FILTRO: Fica invisível até a palma ser detectada -->
+            <a-entity id="filtro-reacao" position="0 0 -1.5" scale="0.8 0.8 0.8" visible="false">
+                
+                <!-- REAGENTE 1: Gás Nitrogênio (N2) - Duas esferas azuis unidas -->
+                <a-entity position="-1.5 0 0">
+                    <a-sphere position="-0.15 0 0" radius="0.15" color="#0000FF"></a-sphere>
+                    <a-sphere position="0.15 0 0" radius="0.15" color="#0000FF"></a-sphere>
+                </a-entity>
+
+                <!-- Sinal de Adição (+) -->
+                <a-entity position="-0.75 0 0">
+                    <a-box position="0 0 0" width="0.04" height="0.2" depth="0.04" color="#FFFFFF"></a-box>
+                    <a-box position="0 0 0" width="0.2" height="0.04" depth="0.04" color="#FFFFFF"></a-box>
+                </a-entity>
+
+                <!-- REAGENTE 2: Gás Hidrogênio (H2) - Duas esferas brancas unidas -->
+                <a-entity position="0 0 0">
+                    <a-sphere position="-0.1" 0 0" radius="0.1" color="#FFFFFF"></a-sphere>
+                    <a-sphere position="0.1 0 0" radius="0.1" color="#FFFFFF"></a-sphere>
+                </a-entity>
+
+                <!-- Seta da Reação (->) -->
+                <a-entity position="0.75 0 0">
+                    <a-box position="-0.05 0 0" width="0.2" height="0.03" depth="0.03" color="#FFFFFF"></a-box>
+                    <a-cone position="0.07 0 0" radius-bottom="0.06" height="0.1" color="#FFFFFF" rotation="0 0 -90"></a-cone>
+                </a-entity>
+
+                <!-- PRODUTO: Amônia (NH3) - Um Nitrogênio central (azul) e 3 Hidrogênios (brancos) -->
+                <a-entity position="1.6 0 0">
+                    <!-- Átomo de Nitrogênio Central -->
+                    <a-sphere position="0 0 0" radius="0.15" color="#0000FF"></a-sphere>
+                    <!-- Três Átomos de Hidrogênio ao redor (Geometria Piramidal Trigonal simulada) -->
+                    <a-sphere position="-0.12 -0.1 0.08" radius="0.1" color="#FFFFFF"></a-sphere>
+                    <a-sphere position="0.12 -0.1 0.08" radius="0.1" color="#FFFFFF"></a-sphere>
+                    <a-sphere position="0 -0.1 -0.14" radius="0.1" color="#FFFFFF"></a-sphere>
+                </a-entity>
+
+            </a-entity>
+        </a-scene>
+    </div>
+
+    <!-- Elemento de vídeo escondido para alimentar o MediaPipe -->
+    <video id="webcam" autoplay playsinline></video>
+
+    <script>
+        const videoElement = document.getElementById('webcam');
+        const filtroReacao = document.getElementById('filtro-reacao');
+        const instrucoes = document.getElementById('instrucoes');
+
+        // Configuração do rastreamento de mãos do MediaPipe
+        const hands = new Hands({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.7,
+            minTrackingConfidence: 0.5
+        });
+
+        hands.onResults(onResults);
+
+        // Ativa a webcam do dispositivo
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({image: videoElement});
+            },
+            width: 1280,
+            height: 720
+        });
+        camera.start();
+
+        // Processa os resultados da IA de detecção de mão
+        function onResults(results) {
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0];
+                
+                // Lógica para detectar PALMA ABERTA:
+                // Verifica se as pontas dos dedos (IDs 8, 12, 16, 20) estão acima das juntas (IDs 6, 10, 14, 18)
+                const isHandOpen = 
+                    landmarks[8].y < landmarks[6].y &&
+                    landmarks[12].y < landmarks[10].y &&
+                    landmarks[16].y < landmarks[14].y &&
+                    landmarks[20].y < landmarks[18].y;
+
+                if (isHandOpen) {
+                    // Centraliza a equação baseada na posição da palma (landmark 9 - base do dedo médio)
+                    const handX = (landmarks[9].x - 0.5) * -2; // Inverte e escala para o espaço 3D
+                    const handY = (landmarks[9].y - 0.5) * -2;
+                    
+                    filtroReacao.setAttribute('position', `${handX} ${handY} -1.5`);
+                    filtroReacao.setAttribute('visible', 'true');
+                    instrucoes.style.display = 'none';
+                } else {
+                    filtroReacao.setAttribute('visible', 'false');
+                }
+            } else {
+                filtroReacao.setAttribute('visible', 'false');
+            }
+        }
+    </script>
+</body>
+</html>
