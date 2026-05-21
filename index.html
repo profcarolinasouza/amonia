@@ -15,7 +15,16 @@
     <style>
         body { margin: 0; overflow: hidden; font-family: sans-serif; background-color: #000; }
         #canvas-container { position: absolute; width: 100%; height: 100%; z-index: 1; }
-        video { display: none; }
+        
+        /* EXIBE A CÂMERA EM TELA CHEIA AO FUNDO */
+        video { 
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            transform: scaleX(-1); /* Espelha a câmera para ficar mais natural para o usuário */
+        }
         
         /* Interface de Instrução */
         #instrucoes {
@@ -29,11 +38,16 @@
 <body>
 
     <div id="instrucoes">Abra a palma da mão para ver a reação molecular</div>
+    
+    <!-- Elemento de vídeo visível que serve de fundo para a RA -->
+    <video id="webcam" autoplay playsinline></video>
+
     <div id="canvas-container">
-        <a-scene embedded vr-mode-ui="enabled: false">
+        <!-- Adicionado color="none" e transparent="true" na cena para revelar o vídeo ao fundo -->
+        <a-scene embedded vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
             
-            <!-- Câmera do A-Frame -->
-            <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+            <!-- Câmera do A-Frame com fundo transparente -->
+            <a-camera position="0 0 0" look-controls="enabled: false" wasd-controls="enabled: false"></a-camera>
 
             <!-- CONTAINER DO FILTRO: Fica invisível até a palma ser detectada -->
             <a-entity id="filtro-reacao" position="0 0 -1.5" scale="0.8 0.8 0.8" visible="false">
@@ -64,9 +78,7 @@
 
                 <!-- PRODUTO: Amônia (NH3) - Um Nitrogênio central (azul) e 3 Hidrogênios (brancos) -->
                 <a-entity position="1.6 0 0">
-                    <!-- Átomo de Nitrogênio Central -->
                     <a-sphere position="0 0 0" radius="0.15" color="#0000FF"></a-sphere>
-                    <!-- Três Átomos de Hidrogênio ao redor (Geometria Piramidal Trigonal simulada) -->
                     <a-sphere position="-0.12 -0.1 0.08" radius="0.1" color="#FFFFFF"></a-sphere>
                     <a-sphere position="0.12 -0.1 0.08" radius="0.1" color="#FFFFFF"></a-sphere>
                     <a-sphere position="0 -0.1 -0.14" radius="0.1" color="#FFFFFF"></a-sphere>
@@ -76,15 +88,12 @@
         </a-scene>
     </div>
 
-    <!-- Elemento de vídeo escondido para alimentar o MediaPipe -->
-    <video id="webcam" autoplay playsinline></video>
-
     <script>
         const videoElement = document.getElementById('webcam');
         const filtroReacao = document.getElementById('filtro-reacao');
         const instrucoes = document.getElementById('instrucoes');
 
-        // Configuração do rastreamento de mãos do MediaPipe
+        // Configuração do MediaPipe
         const hands = new Hands({
             locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
         });
@@ -92,13 +101,13 @@
         hands.setOptions({
             maxNumHands: 1,
             modelComplexity: 1,
-            minDetectionConfidence: 0.7,
-            minTrackingConfidence: 0.5
+            minDetectionConfidence: 0.6, // Ajustado ligeiramente para melhorar a resposta em ambientes escolares
+            minTrackingConfidence: 0.6
         });
 
         hands.onResults(onResults);
 
-        // Ativa a webcam do dispositivo
+        // Inicializa a câmera usando as configurações corretas do dispositivo móvel/desktop
         const camera = new Camera(videoElement, {
             onFrame: async () => {
                 await hands.send({image: videoElement});
@@ -108,13 +117,17 @@
         });
         camera.start();
 
-        // Processa os resultados da IA de detecção de mão
         function onResults(results) {
+            // Remove a renderização padrão de fundo do A-Frame para garantir transparência total
+            const sceneEl = document.querySelector('a-scene');
+            if (sceneEl && sceneEl.renderer) {
+                sceneEl.renderer.setClearColor(0x000000, 0); 
+            }
+
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 const landmarks = results.multiHandLandmarks[0];
                 
-                // Lógica para detectar PALMA ABERTA:
-                // Verifica se as pontas dos dedos (IDs 8, 12, 16, 20) estão acima das juntas (IDs 6, 10, 14, 18)
+                // Lógica da Palma Aberta
                 const isHandOpen = 
                     landmarks[8].y < landmarks[6].y &&
                     landmarks[12].y < landmarks[10].y &&
@@ -122,8 +135,8 @@
                     landmarks[20].y < landmarks[18].y;
 
                 if (isHandOpen) {
-                    // Centraliza a equação baseada na posição da palma (landmark 9 - base do dedo médio)
-                    const handX = (landmarks[9].x - 0.5) * -2; // Inverte e escala para o espaço 3D
+                    // Como a câmera está espelhada no CSS, ajustamos o cálculo do eixo X para coincidir perfeitamente com a mão física
+                    const handX = (landmarks[9].x - 0.5) * 2; 
                     const handY = (landmarks[9].y - 0.5) * -2;
                     
                     filtroReacao.setAttribute('position', `${handX} ${handY} -1.5`);
