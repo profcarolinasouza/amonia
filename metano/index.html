@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtro AR - Combustão do Metano</title>
+    
+    <!-- Bibliotecas de Renderização 3D e AR -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    
+    <!-- Bibliotecas de Rastreamento de Mão (MediaPipe via CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; background-color: #000; }
+        #canvas-container { position: absolute; width: 100%; height: 100%; z-index: 1; }
+        
+        video { 
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            transform: scaleX(-1);
+        }
+        
+        #instrucoes {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7); color: white; padding: 15px 25px;
+            border-radius: 20px; text-align: center; z-index: 10; pointer-events: none;
+            font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="instrucoes">Abra a palma da mão para ver a combustão do metano</div>
+    
+    <video id="webcam" autoplay playsinline></video>
+
+    <div id="canvas-container">
+        <a-scene embedded vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+            
+            <a-camera position="0 0 0" look-controls="enabled: false" wasd-controls="enabled: false"></a-camera>
+
+            <!-- CONTAINER DO FILTRO: Escala compacta e profundidade ideal para visualização completa -->
+            <a-entity id="filtro-reacao" position="0 0 -2.0" scale="0.4 0.4 0.4" visible="false">
+                
+                <!-- REAGENTE 1: Metano (CH4) - Geometria Tetraédrica -->
+                <!-- C = #333333 (Raio 0.14), H = #FFFFFF (Raio 0.08), Ligações = #CCCCCC (Raio 0.02) -->
+                <a-entity position="-1.2 0 0">
+                    <!-- Átomo de Carbono Central -->
+                    <a-sphere position="0 0 0" radius="0.14" color="#333333"></a-sphere>
+                    
+                    <!-- H superior -->
+                    <a-sphere position="0 0.16 0" radius="0.08" color="#FFFFFF"></a-sphere>
+                    <a-cylinder position="0 0.08 0" radius="0.02" height="0.16" color="#CCCCCC"></a-cylinder>
+                    
+                    <!-- H inferior esquerdo frontal -->
+                    <a-sphere position="-0.12 -0.1 0.1" radius="0.08" color="#FFFFFF"></a-sphere>
+                    <a-cylinder position="-0.06 -0.05 0.05" radius="0.02" height="0.15" rotation="45 45 0" color="#CCCCCC"></a-cylinder>
+                    
+                    <!-- H inferior direito frontal -->
+                    <a-sphere position="0.12 -0.1 0.1" radius="0.08" color="#FFFFFF"></a-sphere>
+                    <a-cylinder position="0.06 -0.05 0.05" radius="0.02" height="0.15" rotation="45 -45 0" color="#CCCCCC"></a-cylinder>
+                    
+                    <!-- H inferior traseiro -->
+                    <a-sphere position="0 -0.1 -0.14" radius="0.08" color="#FFFFFF"></a-sphere>
+                    <a-cylinder position="0 -0.05 -0.07" radius="0.02" height="0.15" rotation="-45 0 0" color="#CCCCCC"></a-cylinder>
+                </a-entity>
+
+                <!-- Sinal de Adição (+) -->
+                <a-entity position="-0.6 0 0">
+                    <a-box position="0 0 0" width="0.04" height="0.18" depth="0.04" color="#FFFFFF"></a-box>
+                    <a-box position="0 0 0" width="0.18" height="0.04" depth="0.04" color="#FFFFFF"></a-box>
+                </a-entity>
+
+                <!-- REAGENTE 2: Gás Oxigênio (O2) - Duas esferas vermelhas unidas por ligação dupla -->
+                <!-- O = #FF0000 (Raio 0.13) -->
+                <a-entity position="-0.1 0 0">
+                    <a-sphere position="-0.14 0 0" radius="0.13" color="#FF0000"></a-sphere>
+                    <a-sphere position="0.14 0 0" radius="0.13" color="#FF0000"></a-sphere>
+                    <!-- Ligação Dupla (Dois cilindros paralelos) -->
+                    <a-cylinder position="0 0.03 0" radius="0.018" height="0.28" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
+                    <a-cylinder position="0 -0.03 0" radius="0.018" height="0.28" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
+                </a-entity>
+
+                <!-- Seta da Reação (->) -->
+                <a-entity position="0.4 0 0">
+                    <a-box position="-0.04 0 0" width="0.16" height="0.03" depth="0.03" color="#FFFFFF"></a-box>
+                    <a-cone position="0.06 0 0" radius-bottom="0.06" height="0.09" color="#FFFFFF" rotation="0 0 -90"></a-cone>
+                </a-entity>
+
+                <!-- PRODUTO 1: Dióxido de Carbono (CO2) - Geometria Linear -->
+                <a-entity position="0.9 0 0">
+                    <!-- Carbono Central -->
+                    <a-sphere position="0 0 0" radius="0.14" color="#333333"></a-sphere>
+                    <!-- Oxigênio Esquerdo -->
+                    <a-sphere position="-0.22 0 0" radius="0.13" color="#FF0000"></a-sphere>
+                    <a-cylinder position="-0.11 0.03 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
+                    <a-cylinder position="-0.11 -0.03 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
+                    <!-- Oxigênio Direito -->
+                    <a-sphere position="0.22 0 0" radius="0.13" color="#FF0000"></a-sphere>
+                    <a-cylinder position="0.11 0.03 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
+                    <a-cylinder position="0.11 -0.03 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
+                </a-entity>
+
+                <!-- Sinal de Adição (+) nos Produtos -->
+                <a-entity position="1.4 0 0">
+                    <a-box position="0 0 0" width="0.04" height="0.18" depth="0.04" color="#FFFFFF"></a-box>
+                    <a-box position="0 0 0" width="0.18" height="0.04" depth="0.04" color="#FFFFFF"></a-box>
+                </a-entity>
+
+                <!-- PRODUTO 2: Água (H2O) - Geometria Angular -->
+                <a-entity position="1.9 0 0">
+                    <!-- Oxigênio Central -->
+                    <a-sphere position="0 0.06 0" radius="0.13" color="#FF0000"></a-sphere>
+                    <!-- Hidrogênio Esquerdo -->
+                    <a-sphere position="-0.14 -0.08 0" radius="0.08" color="#FFFFFF"></a-sphere>
+                    <a-cylinder position="-0.07 -0.01 0" radius="0.02" height="0.18" rotation="0 0 45" color="#CCCCCC"></a-cylinder>
+                    <!-- Hidrogênio Direito -->
+                    <a-sphere position="0.14 -0.08 0" radius="0.08" color="#FFFFFF"></a-sphere>
+                    <a-cylinder position="0.07 -0.01 0" radius="0.02" height="0.18" rotation="0 0 -45" color="#CCCCCC"></a-cylinder>
+                </a-entity>
+
+            </a-entity>
+        </a-scene>
+    </div>
+
+    <script>
+        const videoElement = document.getElementById('webcam');
+        const filtroReacao = document.getElementById('filtro-reacao');
+        const instrucoes = document.getElementById('instrucoes');
+
+        const hands = new Hands({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.6,
+            minTrackingConfidence: 0.6
+        });
+
+        hands.onResults(onResults);
+
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({image: videoElement});
+            },
+            width: 1280,
+            height: 720
+        });
+        camera.start();
+
+        function onResults(results) {
+            const sceneEl = document.querySelector('a-scene');
+            if (sceneEl && sceneEl.renderer) {
+                sceneEl.renderer.setClearColor(0x000000, 0); 
+            }
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0];
+                
+                const isHandOpen = 
+                    landmarks[8].y < landmarks[6].y &&
+                    landmarks[12].y < landmarks[10].y &&
+                    landmarks[16].y < landmarks[14].y &&
+                    landmarks[20].y < landmarks[18].y;
+
+                if (isHandOpen) {
+                    // Mapeamento e calibração de espaço baseada na base do dedo médio (landmark 9)
+                    const handX = (landmarks[9].x - 0.5) * 2.2; 
+                    const handY = (landmarks[9].y - 0.5) * -2.2;
+                    
+                    filtroReacao.setAttribute('position', `${handX} ${handY} -2.0`);
+                    filtroReacao.setAttribute('visible', 'true');
+                    instrucoes.style.display = 'none';
+                } else {
+                    filtroReacao.setAttribute('visible', 'false');
+                }
+            } else {
+                filtroReacao.setAttribute('visible', 'false');
+            }
+        }
+    </script>
+</body>
+</html>
