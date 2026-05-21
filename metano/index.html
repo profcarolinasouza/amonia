@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filtro AR - Combustão do Metano</title>
+    <title>Filtro AR Corrigido - Combustão do Metano</title>
     
     <!-- Bibliotecas de Renderização 3D e AR -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
@@ -44,84 +44,82 @@
             
             <a-camera position="0 0 0" look-controls="enabled: false" wasd-controls="enabled: false"></a-camera>
 
-            <!-- CONTAINER DO FILTRO: Escala compacta e profundidade ideal para visualização completa -->
-            <a-entity id="filtro-reacao" position="0 0 -2.0" scale="0.4 0.4 0.4" visible="false">
+            <!-- CONTAINER AJUSTADO: Posição Z em -2.3 para enquadrar a equação inteira sem cortes -->
+            <a-entity id="filtro-reacao" position="0 0 -2.3" scale="0.38 0.38 0.38" visible="false">
                 
-                <!-- REAGENTE 1: Metano (CH4) - Geometria Tetraédrica -->
-                <!-- C = #333333 (Raio 0.14), H = #FFFFFF (Raio 0.08), Ligações = #CCCCCC (Raio 0.02) -->
-                <a-entity position="-1.2 0 0">
-                    <!-- Átomo de Carbono Central -->
-                    <a-sphere position="0 0 0" radius="0.14" color="#333333"></a-sphere>
+                <!-- REAGENTE 1: Metano (CH4) - Rotação ajustada para exibir os 4 Hidrogênios de frente -->
+                <a-entity position="-1.4 0 0" rotation="20 45 0">
+                    <!-- Carbono Central -->
+                    <a-sphere position="0 0 0" radius="0.14" color="#333333" material="shader: flat;"></a-sphere>
                     
-                    <!-- H superior -->
-                    <a-sphere position="0 0.16 0" radius="0.08" color="#FFFFFF"></a-sphere>
-                    <a-cylinder position="0 0.08 0" radius="0.02" height="0.16" color="#CCCCCC"></a-cylinder>
+                    <!-- H1 Superior -->
+                    <a-sphere position="0 0.22 0" radius="0.08" color="#FFFFFF" material="shader: flat;"></a-sphere>
+                    <a-cylinder position="0 0.11 0" radius="0.02" height="0.22" color="#CCCCCC" material="shader: flat;"></a-cylinder>
                     
-                    <!-- H inferior esquerdo frontal -->
-                    <a-sphere position="-0.12 -0.1 0.1" radius="0.08" color="#FFFFFF"></a-sphere>
-                    <a-cylinder position="-0.06 -0.05 0.05" radius="0.02" height="0.15" rotation="45 45 0" color="#CCCCCC"></a-cylinder>
+                    <!-- H2 Inferior Esquerdo -->
+                    <a-sphere position="-0.18 -0.12 0.1" radius="0.08" color="#FFFFFF" material="shader: flat;"></a-sphere>
+                    <a-cylinder position="-0.09 -0.06 0.05" radius="0.02" height="0.22" rotation="30 0 56" color="#CCCCCC" material="shader: flat;"></a-cylinder>
                     
-                    <!-- H inferior direito frontal -->
-                    <a-sphere position="0.12 -0.1 0.1" radius="0.08" color="#FFFFFF"></a-sphere>
-                    <a-cylinder position="0.06 -0.05 0.05" radius="0.02" height="0.15" rotation="45 -45 0" color="#CCCCCC"></a-cylinder>
+                    <!-- H3 Inferior Direito -->
+                    <a-sphere position="0.18 -0.12 0.1" radius="0.08" color="#FFFFFF" material="shader: flat;"></a-sphere>
+                    <a-cylinder position="0.09 -0.06 0.05" radius="0.02" height="0.22" rotation="30 0 -56" color="#CCCCCC" material="shader: flat;"></a-cylinder>
                     
-                    <!-- H inferior traseiro -->
-                    <a-sphere position="0 -0.1 -0.14" radius="0.08" color="#FFFFFF"></a-sphere>
-                    <a-cylinder position="0 -0.05 -0.07" radius="0.02" height="0.15" rotation="-45 0 0" color="#CCCCCC"></a-cylinder>
+                    <!-- H4 Traseiro (Agora visível pelo ângulo inclinado) -->
+                    <a-sphere position="0 -0.12 -0.2" radius="0.08" color="#FFFFFF" material="shader: flat;"></a-sphere>
+                    <a-cylinder position="0 -0.06 -0.1" radius="0.02" height="0.22" rotation="-60 0 0" color="#CCCCCC" material="shader: flat;"></a-cylinder>
                 </a-entity>
 
                 <!-- Sinal de Adição (+) -->
-                <a-entity position="-0.6 0 0">
-                    <a-box position="0 0 0" width="0.04" height="0.18" depth="0.04" color="#FFFFFF"></a-box>
-                    <a-box position="0 0 0" width="0.18" height="0.04" depth="0.04" color="#FFFFFF"></a-box>
+                <a-entity position="-0.75 0 0">
+                    <a-box position="0 0 0" width="0.04" height="0.18" depth="0.04" color="#FFFFFF" material="shader: flat;"></a-box>
+                    <a-box position="0 0 0" width="0.18" height="0.04" depth="0.04" color="#FFFFFF" material="shader: flat;"></a-box>
                 </a-entity>
 
-                <!-- REAGENTE 2: Gás Oxigênio (O2) - Duas esferas vermelhas unidas por ligação dupla -->
-                <!-- O = #FF0000 (Raio 0.13) -->
-                <a-entity position="-0.1 0 0">
-                    <a-sphere position="-0.14 0 0" radius="0.13" color="#FF0000"></a-sphere>
-                    <a-sphere position="0.14 0 0" radius="0.13" color="#FF0000"></a-sphere>
-                    <!-- Ligação Dupla (Dois cilindros paralelos) -->
-                    <a-cylinder position="0 0.03 0" radius="0.018" height="0.28" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
-                    <a-cylinder position="0 -0.03 0" radius="0.018" height="0.28" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
+                <!-- REAGENTE 2: Gás Oxigênio (O2) - Ligação consertada e visível -->
+                <a-entity position="-0.2 0 0">
+                    <a-sphere position="-0.16 0 0" radius="0.13" color="#FF0000" material="shader: flat;"></a-sphere>
+                    <a-sphere position="0.16 0 0" radius="0.13" color="#FF0000" material="shader: flat;"></a-sphere>
+                    <!-- Varetas da Ligação Dupla -->
+                    <a-cylinder position="0 0.04 0" radius="0.018" height="0.32" rotation="0 0 90" color="#CCCCCC" material="shader: flat;"></a-cylinder>
+                    <a-cylinder position="0 -0.04 0" radius="0.018" height="0.32" rotation="0 0 90" color="#CCCCCC" material="shader: flat;"></a-cylinder>
                 </a-entity>
 
                 <!-- Seta da Reação (->) -->
-                <a-entity position="0.4 0 0">
-                    <a-box position="-0.04 0 0" width="0.16" height="0.03" depth="0.03" color="#FFFFFF"></a-box>
-                    <a-cone position="0.06 0 0" radius-bottom="0.06" height="0.09" color="#FFFFFF" rotation="0 0 -90"></a-cone>
+                <a-entity position="0.35 0 0">
+                    <a-box position="-0.04 0 0" width="0.16" height="0.03" depth="0.03" color="#FFFFFF" material="shader: flat;"></a-box>
+                    <a-cone position="0.06 0 0" radius-bottom="0.06" height="0.09" color="#FFFFFF" rotation="0 0 -90" material="shader: flat;"></a-cone>
                 </a-entity>
 
-                <!-- PRODUTO 1: Dióxido de Carbono (CO2) - Geometria Linear -->
-                <a-entity position="0.9 0 0">
-                    <!-- Carbono Central -->
-                    <a-sphere position="0 0 0" radius="0.14" color="#333333"></a-sphere>
-                    <!-- Oxigênio Esquerdo -->
-                    <a-sphere position="-0.22 0 0" radius="0.13" color="#FF0000"></a-sphere>
-                    <a-cylinder position="-0.11 0.03 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
-                    <a-cylinder position="-0.11 -0.03 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
-                    <!-- Oxigênio Direito -->
-                    <a-sphere position="0.22 0 0" radius="0.13" color="#FF0000"></a-sphere>
-                    <a-cylinder position="0.11 0.03 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
-                    <a-cylinder position="0.11 -0.03 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC"></a-cylinder>
+                <!-- PRODUTO 1: Dióxido de Carbono (CO2) -->
+                <a-entity position="0.85 0 0">
+                    <a-sphere position="0 0 0" radius="0.14" color="#333333" material="shader: flat;"></a-sphere>
+                    <a-sphere position="-0.22 0 0" radius="0.13" color="#FF0000" material="shader: flat;"></a-sphere>
+                    <a-cylinder position="-0.11 0.04 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC" material="shader: flat;"></a-cylinder>
+                    <a-cylinder position="-0.11 -0.04 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC" material="shader: flat;"></a-cylinder>
+                    
+                    <a-sphere position="0.22 0 0" radius="0.13" color="#FF0000" material="shader: flat;"></a-sphere>
+                    <a-cylinder position="0.11 0.04 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC" material="shader: flat;"></a-cylinder>
+                    <a-cylinder position="0.11 -0.04 0" radius="0.018" height="0.22" rotation="0 0 90" color="#CCCCCC" material="shader: flat;"></a-cylinder>
                 </a-entity>
 
-                <!-- Sinal de Adição (+) nos Produtos -->
-                <a-entity position="1.4 0 0">
-                    <a-box position="0 0 0" width="0.04" height="0.18" depth="0.04" color="#FFFFFF"></a-box>
-                    <a-box position="0 0 0" width="0.18" height="0.04" depth="0.04" color="#FFFFFF"></a-box>
+                <!-- Sinal de Adição (+) -->
+                <a-entity position="1.35 0 0">
+                    <a-box position="0 0 0" width="0.04" height="0.18" depth="0.04" color="#FFFFFF" material="shader: flat;"></a-box>
+                    <a-box position="0 0 0" width="0.18" height="0.04" depth="0.04" color="#FFFFFF" material="shader: flat;"></a-box>
                 </a-entity>
 
-                <!-- PRODUTO 2: Água (H2O) - Geometria Angular -->
-                <a-entity position="1.9 0 0">
+                <!-- PRODUTO 2: Água (H2O) - Corrigido reflexo/sombra branca e adicionado varetas visíveis -->
+                <a-entity position="1.8 0 0" rotation="0 0 0">
                     <!-- Oxigênio Central -->
-                    <a-sphere position="0 0.06 0" radius="0.13" color="#FF0000"></a-sphere>
+                    <a-sphere position="0 0.08 0" radius="0.13" color="#FF0000" material="shader: flat;"></a-sphere>
+                    
                     <!-- Hidrogênio Esquerdo -->
-                    <a-sphere position="-0.14 -0.08 0" radius="0.08" color="#FFFFFF"></a-sphere>
-                    <a-cylinder position="-0.07 -0.01 0" radius="0.02" height="0.18" rotation="0 0 45" color="#CCCCCC"></a-cylinder>
+                    <a-sphere position="-0.16 -0.06 0" radius="0.08" color="#FFFFFF" material="shader: flat;"></a-sphere>
+                    <a-cylinder position="-0.08 0.01 0" radius="0.02" height="0.18" rotation="0 0 45" color="#CCCCCC" material="shader: flat;"></a-cylinder>
+                    
                     <!-- Hidrogênio Direito -->
-                    <a-sphere position="0.14 -0.08 0" radius="0.08" color="#FFFFFF"></a-sphere>
-                    <a-cylinder position="0.07 -0.01 0" radius="0.02" height="0.18" rotation="0 0 -45" color="#CCCCCC"></a-cylinder>
+                    <a-sphere position="0.16 -0.06 0" radius="0.08" color="#FFFFFF" material="shader: flat;"></a-sphere>
+                    <a-cylinder position="0.08 0.01 0" radius="0.02" height="0.18" rotation="0 0 -45" color="#CCCCCC" material="shader: flat;"></a-cylinder>
                 </a-entity>
 
             </a-entity>
@@ -171,11 +169,10 @@
                     landmarks[20].y < landmarks[18].y;
 
                 if (isHandOpen) {
-                    // Mapeamento e calibração de espaço baseada na base do dedo médio (landmark 9)
-                    const handX = (landmarks[9].x - 0.5) * 2.2; 
-                    const handY = (landmarks[9].y - 0.5) * -2.2;
+                    const handX = (landmarks[9].x - 0.5) * 2.4; 
+                    const handY = (landmarks[9].y - 0.5) * -2.4;
                     
-                    filtroReacao.setAttribute('position', `${handX} ${handY} -2.0`);
+                    filtroReacao.setAttribute('position', `${handX} ${handY} -2.3`);
                     filtroReacao.setAttribute('visible', 'true');
                     instrucoes.style.display = 'none';
                 } else {
